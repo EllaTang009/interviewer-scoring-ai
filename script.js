@@ -110,7 +110,7 @@ scoreBtn.addEventListener('click', async () => {
   resultDiv.innerHTML = "<p>Scoring... Please wait...</p>";
 
   try {
-    const res = await fetch('http://127.0.0.1:5000/score', {
+    const res = await fetch('https://buildings-faqs-lift-solutions.trycloudflare.com/score', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text })
