@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Score History</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="upload-page">
+    <div class="upload-container">
+        <div class="upload-header">
+            <h1>SCORE HISTORY</h1>
+            <a href="upload.html" class="back-link">← BACK TO SCORE</a>
+        </div>
+
+        <div id="historyList"></div>
+    </div>
+
+    <script>
+        const historyList = document.getElementById('historyList');
+        const history = JSON.parse(localStorage.getItem('interviewScoreHistory') || '[]');
+
+        if (history.length === 0) {
+            historyList.innerHTML = "<p>No scoring history yet.</p>";
+        } else {
+            let html = `<div class="history-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Interview Title</th>
+                        <th>Total Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            history.forEach((item, index) => {
+                html += `
+                <tr>
+                    <td>
+                        <a href="#" class="history-title-link" data-index="${index}">${item.title}</a>
+                    </td>
+                    <td>${item.totalScore}</td>
+                    <td>${item.date}</td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+            historyList.innerHTML = html;
+
+            // 绑定点击事件：保存选中的index，跳转到上传页并展示详情
+            document.querySelectorAll('.history-title-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const idx = e.target.dataset.index;
+                    localStorage.setItem('viewScoreIndex', idx);
+                    window.location.href = "upload.html#view-detail";
+                });
+            });
+        }
+    </script>
+</body>
+</html>
