@@ -11,7 +11,7 @@ CORS(app)
 # ✅ 从环境变量读取 API Key（不硬编码，安全）
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
 genai.configure(api_key="AIzaSyB8se4iclHxAUtC5_7W2d-6EETHjr6wtVs")
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+model = genai.GenerativeModel('gemini-2.0-flash')
  
 def evaluate_transcript(content):
     try:
