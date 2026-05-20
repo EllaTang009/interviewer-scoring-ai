@@ -110,7 +110,7 @@ scoreBtn.addEventListener('click', async () => {
   resultDiv.innerHTML = "<p>Scoring... Please wait...</p>";
 
   try {
-    const res = await fetch('https://buildings-faqs-lift-solutions.trycloudflare.com/score', {
+    const res = await fetch('https://interviewer-scoring-ai.onrender.com/score', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text })
