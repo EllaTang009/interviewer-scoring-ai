@@ -15,7 +15,6 @@
         <div id="result"></div>
     </div>
     <script>
-        // 规则分组配置
         const groupConfig = {
             Opening: ["Agenda Setting", "Agenda Clarity", "Rapport Building"],
             Conducting: ["Questioning Strategy", "Responsiveness and Active Listening", "Job Relevant Probing", "Time Management", "Risk Management"],
@@ -29,7 +28,6 @@
         }
  
         function renderVisualization(rawData, interviewType) {
-            // 分组得分
             const grouped = { Opening: [], Conducting: [], Closing: [] };
             rawData.forEach(item => {
                 const ruleName = item["Rule Name"];
@@ -91,7 +89,7 @@
                 let color, label;
                 if (isBinary) {
                     color = item.Result === 2 ? "#1D9E75" : "#E24B4A";
-                    label = item.Result === 2 ? "✓" : "✗";
+                    label = item.Result === 2 ? "2 (✓)" : "1 (✗)";
                 } else {
                     color = item.Result === 3 ? "#1D9E75" : item.Result === 2 ? "#378ADD" : "#E24B4A";
                     label = item.Result;
@@ -99,11 +97,11 @@
                 const shortName = item["Rule Name"].length > 26 ? item["Rule Name"].slice(0, 24) + "…" : item["Rule Name"];
                 return `
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;">
-                    <div style="width:175px;flex-shrink:0;font-size:12px;color:var(--color-text-secondary, #666);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${shortName}</div>
+                    <div style="width:175px;flex-shrink:0;font-size:12px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${shortName}</div>
                     <div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden;">
                         <div style="width:${Math.round(ratio * 100)}%;height:100%;background:${color};border-radius:4px;"></div>
                     </div>
-                    <div style="width:20px;text-align:right;font-size:12px;color:#666;">${label}</div>
+                    <div style="width:44px;text-align:right;font-size:12px;color:#666;">${label}</div>
                 </div>`;
             }).join("");
  
@@ -165,6 +163,7 @@
                         </div>
                         ${barsHtml}
                     </div>
+ 
                 </div>
             </div>`;
         }
@@ -190,12 +189,13 @@
                     const reasoning = item.Reasoning || "";
                     const isBinary = binaryRules.some(b => rule.includes(b));
                     const scoreClass = isBinary ? (res === 2 ? "yes-score" : "no-score") : "num-score";
+                    const displayScore = isBinary ? (res === 2 ? "2 (✓)" : "1 (✗)") : res;
  
                     html += `
                     <div class="score-card">
                         <div class="card-head">
                             <h3>${rule.toUpperCase()}</h3>
-                            <span class="${scoreClass}">${res}</span>
+                            <span class="${scoreClass}">${displayScore}</span>
                         </div>
                         <div class="card-sub">${groupName}</div>
                         <div class="card-section">
@@ -222,7 +222,6 @@
             return html;
         }
  
-        // 页面加载：从 localStorage 读取结果
         window.addEventListener('load', () => {
             const resultDiv = document.getElementById('result');
             const data = localStorage.getItem('currentResult');
@@ -237,7 +236,6 @@
             const interviewType = result.interviewType || "Not Specified";
             const title = result.title || "Untitled Interview";
  
-            // 更新页面标题
             document.querySelector('h1').textContent = title.toUpperCase();
  
             resultDiv.innerHTML =
