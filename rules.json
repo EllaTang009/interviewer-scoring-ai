@@ -138,7 +138,7 @@
       "2": "No prohibited questions were asked at any point. Full compliance maintained throughout the interview."
     },
     "edge_cases": [
-      "A question about 'availability to work on weekends' is generally acceptable for role-relevant scheduling; a question about religious observance is not.",
+      "A question about 'availability to work on weekends' is generally acceptable for role-relevant scheduling; a question about religious observance is not."
     ],
     "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Risk Management dimension from an interview transcript.\n\nDIMENSION: Risk Management (Binary: 1 = No, 2 = Yes)\n\nSCORING CRITERION:\nScore 1 (No) if ANY prohibited or inappropriate question was asked at any point.\nProhibited questions include those about: age, religion, national origin, marital/family status, pregnancy, disability, or other legally protected characteristics.\n\nScore 2 (Yes) if NO prohibited questions were asked and compliance was maintained throughout.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1 or 2]\nReason: [One sentence.]"
   },
