@@ -2,232 +2,281 @@
   {
     "name": "Agenda Setting",
     "type": "binary",
-    "scale": [1, 2],
+    "scale": [
+      1,
+      2
+    ],
     "core_scoring_question": "Did the interviewer introduce themselves, state the purpose of the interview, and provide a brief structural overview?",
     "criteria": {
-      "1": "Any ONE of the three required elements is missing: (1) self-introduction — the interviewer states their name and/or role; (2) purpose statement — the interviewer explains what this interview is for; (3) structural overview — the interviewer describes the flow or sections of the interview.",
-      "2": "All three elements are present in some form. The self-introduction may be brief ('I'm [Name], a recruiter here at Roblox'). The purpose may be implicit but clear. The structural overview may be simple ('We'll go through your background, then some role-specific questions'). Do NOT evaluate quality here — that is Agenda Clarity."
+      "1": "Any ONE of the three required elements is missing: (1) self-introduction - the interviewer states their name and/or role; (2) purpose statement - the interviewer explains what this interview is for; (3) structural overview - the interviewer describes the flow or sections of the interview.",
+      "2": "All three elements are present in some form. The self-introduction may be brief. The purpose may be implicit but clear. The structural overview may be simple. Do NOT evaluate quality here - that is Agenda Clarity."
     },
     "edge_cases": [
-      "Prior familiarity (recruiter and candidate have met before): a shortened introduction is acceptable — score Yes.",
-      "'Tell me about yourself' with no other framing = No. No context is provided.",
+      "Prior familiarity (recruiter and candidate have met before): a shortened introduction is acceptable - score Yes.",
+      "Tell me about yourself with no other framing = No. No context is provided.",
       "Do NOT score Agenda Clarity here. Only evaluate whether the three elements exist."
     ],
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Agenda Setting dimension from an interview transcript.\n\nDIMENSION: Agenda Setting (Binary: 1 = No, 2 = Yes)\n\nSCORING CRITERION:\nScore 2 (Yes) if and only if ALL THREE of the following elements are present:\n1. Self-introduction — the interviewer states their name and/or role.\n2. Purpose statement — the interviewer explains what this interview is for.\n3. Structural overview — the interviewer describes the flow or sections of the interview.\n\nScore 1 (No) if any one of the three elements is missing.\n\nEDGE CASES:\n- Prior familiarity (recruiter/candidate have met before): a shortened introduction is acceptable — score 2.\n- 'Tell me about yourself' with no other framing = 1.- Do NOT score Agenda Clarity here. Only evaluate whether the three elements exist.OUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\n-Score: [1 or 2] \n-Reason: [One sentence explaining why, referencing which elements were present or absent.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Agenda Setting dimension from an interview transcript.\n\nDIMENSION: Agenda Setting (Binary: 1 = No, 2 = Yes)\n\nSCORING CRITERION:\nScore 2 (Yes) if and only if ALL THREE of the following elements are present:\n1. Self-introduction - the interviewer states their name and/or role.\n2. Purpose statement - the interviewer explains what this interview is for.\n3. Structural overview - the interviewer describes the flow or sections of the interview.\n\nScore 1 (No) if any one of the three elements is missing.\n\nEDGE CASES:\n- Prior familiarity (recruiter/candidate have met before): a shortened introduction is acceptable - score 2.\n- Tell me about yourself with no other framing = 1.\n- Do NOT score Agenda Clarity here. Only evaluate whether the three elements exist.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1 or 2]\nReason: [One sentence explaining why, referencing which elements were present or absent.]"
   },
   {
     "name": "Agenda Clarity",
     "type": "scaled",
-    "scale": [1, 2, 3],
+    "scale": [
+      1,
+      2,
+      3
+    ],
     "core_scoring_question": "How complete, sequenced, and time-oriented was the opening agenda?",
     "criteria": {
-      "1": "No structural introduction at all. The interview begins immediately with a question (e.g., 'Let's just get started' or 'Tell me about yourself' without any framing).",
-      "2": "At least two sections of the interview are mentioned (e.g., 'I'll ask about your background, then some role questions'). No time estimate is required for 2. Partial agendas that mention only one element score 2 if intent is clear.",
-      "3": "ALL THREE sub-elements must be present simultaneously: (a) clear sequencing of 3 or more phases, (b) a time estimate (e.g., 'this will take about 45 minutes'), (c) explicit mention of time for candidate questions. Missing any one sub-element caps the score at 2."
+      "1": "No structural introduction at all. The interview begins immediately with a question.",
+      "2": "At least two sections of the interview are mentioned. No time estimate is required for 2. Partial agendas that mention only one element score 2 if intent is clear.",
+      "3": "ALL THREE sub-elements must be present simultaneously: (a) clear sequencing of 3 or more phases, (b) a time estimate, (c) explicit mention of time for candidate questions. Missing any one sub-element caps the score at 2."
     },
     "edge_cases": [
       "Time estimate alone, without listing phases = 2 (not 3).",
       "Phases listed without time estimate = 2 (not 3).",
       "Distinguish from Agenda Setting: Agenda Clarity scores quality; Agenda Setting scores presence.",
-      "Expert raters apply a stricter standard for 3 — when in doubt between 2 and 3, assign 2."
+      "Expert raters apply a stricter standard for 3 - when in doubt between 2 and 3, assign 2."
     ],
     "calibration_note": "Expert raters apply a strict standard for 3. When uncertain between 2 and 3, assign 2.",
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Agenda Clarity dimension from an interview transcript.\n\nDIMENSION: Agenda Clarity (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nSCORING CRITERIA:\n1 (Poor): No structural introduction. Interview begins immediately ('Let's get started', 'Tell me about yourself').\n2 (Adequate): At least two sections mentioned. Time estimate NOT required. Partial agendas qualify for 2 if intent is clear.\n3 (Excellent): ALL THREE sub-elements must be present:\n   (a) Sequencing of 3 or more phases,\n   (b) Time estimate (e.g., 'this will take about 45 minutes'),\n   (c) Explicit mention of time for candidate questions.\nMissing any one sub-element caps the score at 2.\n\nCALIBRATION NOTE: Expert raters apply a strict standard for 3. When uncertain between 2 and 3, assign 2.\n\nEDGE CASES:\n- Time estimate alone with no phases = 2.\n- Phases listed, no time estimate = 2.\n- Do NOT score whether the interviewer introduced themselves (that is Agenda Setting).\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One to two sentences referencing which sub-elements were present or absent.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Agenda Clarity dimension from an interview transcript.\n\nDIMENSION: Agenda Clarity (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nSCORING CRITERIA:\n1 (Poor): No structural introduction. Interview begins immediately.\n2 (Adequate): At least two sections mentioned. Time estimate NOT required. Partial agendas qualify for 2 if intent is clear.\n3 (Excellent): ALL THREE sub-elements must be present:\n   (a) Sequencing of 3 or more phases,\n   (b) Time estimate,\n   (c) Explicit mention of time for candidate questions.\nMissing any one sub-element caps the score at 2.\n\nCALIBRATION NOTE: Expert raters apply a strict standard for 3. When uncertain between 2 and 3, assign 2.\n\nEDGE CASES:\n- Time estimate alone with no phases = 2.\n- Phases listed, no time estimate = 2.\n- Do NOT score whether the interviewer introduced themselves (that is Agenda Setting).\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One to two sentences referencing which sub-elements were present or absent.]"
   },
   {
     "name": "Rapport Building",
     "type": "scaled",
-    "scale": [1, 2, 3],
+    "scale": [
+      1,
+      2,
+      3
+    ],
     "core_scoring_question": "Did the interviewer use language to create a warm, personalized, and comfortable interaction?",
     "criteria": {
-      "1": "No rapport-building behavior. Interaction is impersonal, cold, or reads as purely transactional. No greeting beyond 'Hello, let's begin.'",
-      "2": "Some rapport attempt present but brief, generic, or formulaic. Examples: 'How's your day going?' without follow-up; 'Thanks for joining' before immediately starting. The attempt exists but is not sustained or personalized.",
-      "3": "Warm, personalized rapport that continues beyond the opening. Must include at least one specific, personalized element (e.g., referencing the candidate's background, expressing genuine interest in a detail they mentioned, or using affirming transitions throughout the interview). Generic pleasantries repeated throughout = 2, not 3."
+      "1": "No rapport-building behavior. Interaction is impersonal, cold, or reads as purely transactional.",
+      "2": "Some rapport attempt present but brief, generic, or formulaic. The attempt exists but is not sustained or personalized.",
+      "3": "Warm, personalized rapport that continues beyond the opening. Must include at least one specific, personalized element. Generic pleasantries repeated throughout = 2, not 3."
     },
     "edge_cases": [
-      "Coding interviews are naturally harder to build rapport in — factor in interview type when calibrating.",
-      "Evaluate ONLY language evidence. Do NOT infer warmth from tone of voice, pacing, or non-verbal cues — these are not available in transcripts.",
-      "Generic pleasantries ('Great, thanks', 'Okay') repeated throughout = 2, not 3.",
+      "Coding interviews are naturally harder to build rapport in - factor in interview type when calibrating.",
+      "Evaluate ONLY language evidence. Do NOT infer warmth from tone of voice, pacing, or non-verbal cues - these are not available in transcripts.",
+      "Generic pleasantries repeated throughout = 2, not 3.",
       "A single warm personalized comment combined with continued affirming transitions throughout = 3."
     ],
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Rapport Building dimension from an interview transcript.\n\nDIMENSION: Rapport Building (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nIMPORTANT CONSTRAINT: Evaluate ONLY what is visible in the transcript text. Do NOT infer rapport from tone of voice, pacing, or non-verbal cues — these are not available.\n\nSCORING CRITERIA:\n1 (Poor): No rapport-building language. Interaction is impersonal or immediately task-focused.\n2 (Adequate): Generic, brief attempt (e.g., 'How's your day?', 'Thanks for joining') but not sustained or personalized.\n3 (Excellent): At least one personalized, specific rapport element (referencing candidate's background, showing genuine interest in a detail they shared) AND affirming, warm transitions throughout.\n\nEDGE CASES:\n- Coding interviews are naturally less rapport-heavy. Adjust expectations accordingly.\n- Repeated generic phrases ('Great, thanks') throughout = 2, not 3.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One sentence explaining the score, referencing specific language evidence.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Rapport Building dimension from an interview transcript.\n\nDIMENSION: Rapport Building (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nIMPORTANT CONSTRAINT: Evaluate ONLY what is visible in the transcript text. Do NOT infer rapport from tone of voice, pacing, or non-verbal cues - these are not available.\n\nSCORING CRITERIA:\n1 (Poor): No rapport-building language. Interaction is impersonal or immediately task-focused.\n2 (Adequate): Generic, brief attempt but not sustained or personalized.\n3 (Excellent): At least one personalized, specific rapport element AND affirming, warm transitions throughout.\n\nEDGE CASES:\n- Coding interviews are naturally less rapport-heavy. Adjust expectations accordingly.\n- Repeated generic phrases throughout = 2, not 3.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One sentence explaining the score, referencing specific language evidence.]"
   },
   {
     "name": "Questioning Strategy and Adherence",
     "type": "scaled",
-    "scale": [1, 2, 3],
+    "scale": [
+      1,
+      2,
+      3
+    ],
     "core_scoring_question": "Were the interviewer's questions structured, job-relevant, and equitably applied?",
     "criteria": {
-      "1": "Questions are visibly disorganized, off-topic, or unfair (e.g., only certain types of questions asked of this candidate that wouldn't apply to all candidates for the same role; random topic jumps with no coherent thread).",
-      "2": "Questions are generally job-relevant and follow a recognizable structure, with minor inconsistencies. Occasional topic shifts without clear transitions are acceptable. The overall arc is coherent.",
+      "1": "Questions are visibly disorganized, off-topic, or unfair. Random topic jumps with no coherent thread.",
+      "2": "Questions are generally job-relevant and follow a recognizable structure, with minor inconsistencies. The overall arc is coherent.",
       "3": "Questions are precisely aligned to the role, consistently structured throughout, and applied fairly. Every question has a clear evaluative purpose. Transitions between topics are smooth and natural."
     },
     "edge_cases": [
-      "Adding an unscripted but relevant follow-up question is acceptable — do not penalize for reasonable improvisation.",
+      "Adding an unscripted but relevant follow-up question is acceptable - do not penalize for reasonable improvisation.",
       "Distinguish from Job Relevant Probing: this dimension scores structural quality and fairness of the PRIMARY questions; Job Relevant Probing scores the depth and relevance of follow-up probes.",
-      "NOTE: Per the December 2025 report, this dimension is proposed for removal due to overlap with Job Relevant Probing and near-zero adherence variance in Roblox's structured interview format. If retained, focus evaluation on Questioning STRATEGY quality, not adherence."
+      "Focus evaluation on Questioning STRATEGY quality, not adherence."
     ],
     "calibration_note": "Roblox interviews are almost universally highly structured, so adherence has minimal variance. Focus scoring on question quality and fairness (Questioning Strategy), not adherence.",
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Questioning Strategy and Adherence dimension from an interview transcript.\n\nDIMENSION: Questioning Strategy and Adherence (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nIMPORTANT CONTEXT: Roblox interviews are almost universally highly structured (adherence is near-universal). Therefore, focus your evaluation on Questioning STRATEGY — the quality, relevance, and fairness of the questions.\n\nSCORING CRITERIA:\n1 (Poor): Visibly disorganized, off-topic, or unfair questions. Random topic jumps with no coherent thread.\n2 (Adequate): Generally job-relevant and structured with minor inconsistencies. Topic transitions may be abrupt but the overall arc is coherent.\n3 (Excellent): All questions are precisely aligned to the role. Structure is consistent throughout. Transitions are smooth. Every question has a clear evaluative purpose.\n\nEDGE CASES:\n- Unscripted but relevant follow-up = acceptable. Do not penalize.\n- Distinguish from Job Relevant Probing: score the main questions here, not the follow-up probes.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One to two sentences on structure and relevance of questions.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Questioning Strategy and Adherence dimension from an interview transcript.\n\nDIMENSION: Questioning Strategy and Adherence (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nIMPORTANT CONTEXT: Roblox interviews are almost universally highly structured (adherence is near-universal). Therefore, focus your evaluation on Questioning STRATEGY - the quality, relevance, and fairness of the questions.\n\nSCORING CRITERIA:\n1 (Poor): Visibly disorganized, off-topic, or unfair questions. Random topic jumps with no coherent thread.\n2 (Adequate): Generally job-relevant and structured with minor inconsistencies. Topic transitions may be abrupt but the overall arc is coherent.\n3 (Excellent): All questions are precisely aligned to the role. Structure is consistent throughout. Transitions are smooth. Every question has a clear evaluative purpose.\n\nEDGE CASES:\n- Unscripted but relevant follow-up = acceptable. Do not penalize.\n- Distinguish from Job Relevant Probing: score the main questions here, not the follow-up probes.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One to two sentences on structure and relevance of questions.]"
   },
   {
     "name": "Responsiveness and Active Listening",
     "type": "scaled",
-    "scale": [1, 2, 3],
+    "scale": [
+      1,
+      2,
+      3
+    ],
     "core_scoring_question": "Did the interviewer demonstrate genuine listening by responding specifically to what the candidate said?",
     "criteria": {
       "1": "Little to no evidence of listening. Examples: interrupting, asking unrelated follow-up questions, or reading mechanically from a script without acknowledging what was said.",
-      "2": "Basic acknowledgment signals are present: 'okay', 'got it', 'thanks', 'great'. These are the STANDARD for 2, NOT 3. Occasional single-word repetition of something the candidate said also qualifies as 2.",
-      "3": "Active, substantive engagement with the candidate's specific content: paraphrasing or summarizing ('So it sounds like your main focus was X'), explicitly connecting the next question to what was just shared, or asking a clarifying question that directly references something the candidate said."
+      "2": "Basic acknowledgment signals are present: okay, got it, thanks, great. These are the STANDARD for 2, NOT 3.",
+      "3": "Active, substantive engagement with the candidate's specific content: paraphrasing or summarizing, explicitly connecting the next question to what was just shared, or asking a clarifying question that directly references something the candidate said."
     },
     "edge_cases": [
-      "'That's really interesting' without referencing specific content = 2 (polite, not substantive).",
-      "'So if I understand correctly, you were managing both the frontend and backend...' = 3 (specific paraphrase).",
+      "That's really interesting without referencing specific content = 2 (polite, not substantive).",
+      "Specific paraphrase of candidate response = 3.",
       "Distinguish from Job Relevant Probing: Responsiveness scores whether the interviewer ACKNOWLEDGED what was said; Job Relevant Probing scores the depth of follow-up questions.",
       "Do NOT upgrade to 3 for repeated generic fillers, regardless of frequency."
     ],
-    "calibration_note": "'okay', 'got it', 'thanks', 'great' are standard 2-point responses, NOT 3-point. Only upgrade to 3 if there is substantive engagement with the candidate's specific content.",
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Responsiveness and Active Listening dimension from an interview transcript.\n\nDIMENSION: Responsiveness and Active Listening (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nCALIBRATION NOTE: 'okay', 'got it', 'thanks', 'great' are standard 2-point responses, NOT 3-point. Only upgrade to 3 if there is substantive engagement with the candidate's specific content.\n\nSCORING CRITERIA:\n1 (Poor): No listening evidence. Interruptions, unrelated follow-ups, or mechanical script-reading with no acknowledgment.\n2 (Adequate): Basic fillers present ('okay', 'got it', 'thanks'). These are 2-point behavior, not 3-point.\n3 (Excellent): Substantive engagement: paraphrasing the candidate's response, summarizing what was said, or explicitly connecting the next question to what the candidate just shared.\n\nEDGE CASES:\n'That's really interesting' (no specific content) = 2.\n'So if I understand correctly, you led both the frontend and backend...' = 3.\nDo NOT conflate with Job Relevant Probing — this dimension is about acknowledgment, not follow-up depth.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One sentence, citing whether acknowledgment was generic or content-specific.]"
+    "calibration_note": "okay, got it, thanks, great are standard 2-point responses, NOT 3-point. Only upgrade to 3 if there is substantive engagement with the candidate's specific content.",
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Responsiveness and Active Listening dimension from an interview transcript.\n\nDIMENSION: Responsiveness and Active Listening (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nCALIBRATION NOTE: okay, got it, thanks, great are standard 2-point responses, NOT 3-point. Only upgrade to 3 if there is substantive engagement with the candidate's specific content.\n\nSCORING CRITERIA:\n1 (Poor): No listening evidence. Interruptions, unrelated follow-ups, or mechanical script-reading with no acknowledgment.\n2 (Adequate): Basic fillers present. These are 2-point behavior, not 3-point.\n3 (Excellent): Substantive engagement: paraphrasing the candidate's response, summarizing what was said, or explicitly connecting the next question to what the candidate just shared.\n\nEDGE CASES:\n- Generic positive response with no specific content = 2.\n- Specific paraphrase of candidate content = 3.\n- Do NOT conflate with Job Relevant Probing - this dimension is about acknowledgment, not follow-up depth.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One sentence, citing whether acknowledgment was generic or content-specific.]"
   },
   {
     "name": "Job Relevant Probing",
     "type": "scaled",
-    "scale": [1, 2, 3],
+    "scale": [
+      1,
+      2,
+      3
+    ],
     "core_scoring_question": "Did the interviewer consistently ask targeted, role-relevant follow-up probes tied directly to the candidate's prior responses?",
     "criteria": {
-      "1": "Follow-up probes are absent, irrelevant, or generic ('Tell me more' with no direction). The interviewer moves to the next primary question without building on the candidate's answer.",
-      "2": "Some effective probing occurs but is inconsistent. Examples: probes present for 2-3 questions but absent for others; or probes are relevant but shallow (only asking about tools used, not about decision-making or impact).",
+      "1": "Follow-up probes are absent, irrelevant, or generic. The interviewer moves to the next primary question without building on the candidate's answer.",
+      "2": "Some effective probing occurs but is inconsistent. Probes present for some questions but absent for others; or probes are relevant but shallow.",
       "3": "Probing is consistent across most questions. Probes directly reference the candidate's prior words and dig into decision-making, stakeholder dynamics, measurement of success, or lessons learned. One or two missed opportunities are acceptable, but NOT multiple consecutive ones."
     },
     "edge_cases": [
-      "'What happened next?' with clear directional intent = effective probe (not penalized).",
+      "What happened next with clear directional intent = effective probe (not penalized).",
       "Moving on after a shallow answer without any probe = missed opportunity, affects score.",
       "Distinguish from Responsiveness: Job Relevant Probing scores the DEPTH of follow-up questions; Responsiveness scores whether the interviewer acknowledged what was said.",
-      "Expert raters apply a stricter standard for 3 — a few good probes surrounded by many missed opportunities = 2."
+      "Expert raters apply a stricter standard for 3 - a few good probes surrounded by many missed opportunities = 2."
     ],
     "calibration_note": "Expert raters require CONSISTENT probing for a 3, not just a few standout probes. Multiple missed opportunities after shallow answers should cap the score at 2.",
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Job Relevant Probing dimension from an interview transcript.\n\nDIMENSION: Job Relevant Probing (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nCALIBRATION NOTE: Expert raters require CONSISTENT probing for a 3, not just a few standout probes. Multiple missed opportunities after shallow answers should cap the score at 2.\n\nSCORING CRITERIA:\n1 (Poor): Probes absent, irrelevant, or directionless ('Tell me more' with no focus).\n2 (Adequate): Some effective probing, but inconsistent or limited in depth. Probes present for some questions, absent for others.\n3 (Excellent): Consistent probing across most questions, directly referencing the candidate's words, and digging into decisions, impact, stakeholders, or lessons learned. 1-2 missed opportunities acceptable, not consecutive gaps.\n\nEDGE CASES:\n'What happened next?' with clear direction = effective probe.\nMoving on after shallow answer without probe = missed opportunity.\nDistinguish from Responsiveness and Active Listening: score depth of follow-up questions here, not acknowledgment behavior.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One to two sentences on consistency and depth of probing.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Job Relevant Probing dimension from an interview transcript.\n\nDIMENSION: Job Relevant Probing (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nCALIBRATION NOTE: Expert raters require CONSISTENT probing for a 3, not just a few standout probes. Multiple missed opportunities after shallow answers should cap the score at 2.\n\nSCORING CRITERIA:\n1 (Poor): Probes absent, irrelevant, or directionless.\n2 (Adequate): Some effective probing, but inconsistent or limited in depth. Probes present for some questions, absent for others.\n3 (Excellent): Consistent probing across most questions, directly referencing the candidate's words, and digging into decisions, impact, stakeholders, or lessons learned. 1-2 missed opportunities acceptable, not consecutive gaps.\n\nEDGE CASES:\n- What happened next with clear direction = effective probe.\n- Moving on after shallow answer without probe = missed opportunity.\n- Distinguish from Responsiveness and Active Listening: score depth of follow-up questions here, not acknowledgment behavior.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One to two sentences on consistency and depth of probing.]"
   },
   {
     "name": "Time Management",
     "type": "scaled",
-    "scale": [1, 2, 3],
+    "scale": [
+      1,
+      2,
+      3
+    ],
     "core_scoring_question": "Did the interviewer demonstrate active, explicit time management behavior?",
     "criteria": {
       "1": "No time awareness. The interview either ends abruptly without explanation, or the interviewer allows the interview to drift without any pacing signals or redirection of extended responses.",
-      "2": "Transition language is present ('Let's move on', 'We're running a bit short', 'Let's shift to the next topic') but NO specific time reference is made. This is the standard 2-point behavior.",
-      "3": "Must include at least ONE of the following explicit behaviors: (a) Stating how much time remains ('We have about 10 minutes left'); (b) Explaining a transition in terms of pacing ('Let's move on so we have time for all topics'); (c) Politely redirecting a lengthy response with an explicit reason ('I'm going to pause you there so we can cover the last question')."
+      "2": "Transition language is present but NO specific time reference is made. This is the standard 2-point behavior.",
+      "3": "Must include at least ONE of the following explicit behaviors: (a) Stating how much time remains; (b) Explaining a transition in terms of pacing; (c) Politely redirecting a lengthy response with an explicit reason."
     },
     "edge_cases": [
-      "'Let's move to the next question' = 2 (transition only, no time reference).",
-      "'We have about 10 minutes — let's move to the final section' = 3 (explicit time reference).",
+      "Let's move to the next question = 2 (transition only, no time reference).",
+      "We have about 10 minutes - let's move to the final section = 3 (explicit time reference).",
       "Timestamp evidence from the transcript: starting and ending on time supports a 2, but does NOT alone warrant 3.",
-      "Timezone acknowledgment ('Thanks for doing this later on the East Coast') is unrelated to time management — do not count.",
+      "Timezone acknowledgment is unrelated to time management - do not count.",
       "When in doubt between 2 and 3, assign 2."
     ],
-    "calibration_note": "Transition language alone ('let's move on') = 2. Explicit time reference or active redirection with a stated reason = 3. When in doubt between 2 and 3, assign 2.",
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Time Management dimension from an interview transcript.\n\nDIMENSION: Time Management (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nCALIBRATION NOTE: Transition language alone ('let's move on') = 2. Explicit time reference or active redirection = 3. When in doubt between 2 and 3, assign 2.\n\nSCORING CRITERIA:\n1 (Poor): No pacing signals. Interview drifts, ends abruptly, or lengthy responses go unredirected.\n2 (Adequate): Transition phrases present ('Let's move on', 'We're running a bit short') but NO specific time stated.\n3 (Excellent): At least ONE of:\n   (a) States time remaining: 'We have about 10 minutes left'\n   (b) Explains transition with time reason: 'Let's shift so we cover everything'\n   (c) Politely redirects a lengthy response: 'I'm going to pause you there so we have time for one more'\n\nEDGE CASES:\n- 'Let's move to the next question' = 2 (no time reference).\n- Timezone acknowledgment is irrelevant — do not count.\n- Timestamps showing on-time start/end = supporting evidence for 2, not sufficient for 3.\n\nOUTPUT FORMAT:\nEvidence: [Quote the specific pacing/time language from the transcript, or note its absence.]\nScore: [1, 2, or 3]\nReason: [One sentence referencing whether explicit time language was present.]"
+    "calibration_note": "Transition language alone = 2. Explicit time reference or active redirection with a stated reason = 3. When in doubt between 2 and 3, assign 2.",
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Time Management dimension from an interview transcript.\n\nDIMENSION: Time Management (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nCALIBRATION NOTE: Transition language alone = 2. Explicit time reference or active redirection = 3. When in doubt between 2 and 3, assign 2.\n\nSCORING CRITERIA:\n1 (Poor): No pacing signals. Interview drifts, ends abruptly, or lengthy responses go unredirected.\n2 (Adequate): Transition phrases present but NO specific time stated.\n3 (Excellent): At least ONE of:\n   (a) States time remaining\n   (b) Explains transition with time reason\n   (c) Politely redirects a lengthy response with explicit reason\n\nEDGE CASES:\n- Simple next question transition = 2 (no time reference).\n- Timezone acknowledgment is irrelevant - do not count.\n- Timestamps showing on-time start/end = supporting evidence for 2, not sufficient for 3.\n\nOUTPUT FORMAT:\nEvidence: [Quote the specific pacing/time language from the transcript, or note its absence.]\nScore: [1, 2, or 3]\nReason: [One sentence referencing whether explicit time language was present.]"
   },
   {
     "name": "Risk Management",
     "type": "binary",
-    "scale": [1, 2],
+    "scale": [
+      1,
+      2
+    ],
     "core_scoring_question": "Did the interviewer avoid all prohibited or inappropriate questions throughout the interview?",
     "criteria": {
       "1": "At least one inappropriate or prohibited question was asked (e.g., questions about age, religion, national origin, marital status, pregnancy, disability, or other legally protected characteristics).",
       "2": "No prohibited questions were asked at any point. Full compliance maintained throughout the interview."
     },
     "edge_cases": [
-      "A question about 'availability to work on weekends' is generally acceptable for role-relevant scheduling; a question about religious observance is not."
+      "A question about availability to work on weekends is generally acceptable for role-relevant scheduling; a question about religious observance is not."
     ],
     "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Risk Management dimension from an interview transcript.\n\nDIMENSION: Risk Management (Binary: 1 = No, 2 = Yes)\n\nSCORING CRITERION:\nScore 1 (No) if ANY prohibited or inappropriate question was asked at any point.\nProhibited questions include those about: age, religion, national origin, marital/family status, pregnancy, disability, or other legally protected characteristics.\n\nScore 2 (Yes) if NO prohibited questions were asked and compliance was maintained throughout.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1 or 2]\nReason: [One sentence.]"
   },
   {
     "name": "Candidate Question Invitation",
     "type": "binary",
-    "scale": [1, 2],
+    "scale": [
+      1,
+      2
+    ],
     "core_scoring_question": "Did the interviewer provide any opportunity for the candidate to ask questions?",
     "criteria": {
-      "1": "The interviewer did not invite candidate questions at all, OR explicitly cancelled the opportunity (e.g., 'We're out of time, so we won't have time for questions today').",
-      "2": "Any form of invitation counts — including the minimal 'Do you have any questions for me?'. The quality of the invitation is scored under Closing Quality, not here. The candidate declining to ask questions does NOT change the score."
+      "1": "The interviewer did not invite candidate questions at all, OR explicitly cancelled the opportunity.",
+      "2": "Any form of invitation counts - including the minimal Do you have any questions for me. The quality of the invitation is scored under Closing Quality, not here. The candidate declining to ask questions does NOT change the score."
     },
     "edge_cases": [
-      "The candidate saying 'No, I don't have questions' does not change the score — the invitation is what matters.",
+      "The candidate saying No, I don't have questions does not change the score - the invitation is what matters.",
       "Interviewer invites questions but then interrupts the candidate's response = still Yes (invitation was issued).",
-      "Do NOT score how well the interviewer answered the candidate's questions — that is outside scope.",
+      "Do NOT score how well the interviewer answered the candidate's questions - that is outside scope.",
       "This dimension scores only PRESENCE of invitation. Quality is scored under Closing Quality."
     ],
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Candidate Question Invitation dimension from an interview transcript.\n\nDIMENSION: Candidate Question Invitation (Binary: 0 = No, 1 = Yes)\n\nSCORING CRITERION:\nScore 1 if the interviewer issued any form of invitation for candidate questions.\nEven the minimal 'Do you have any questions for me?' qualifies as 1.\nScore 0 only if no invitation was issued, or if the interviewer explicitly cancelled the opportunity.\n\nEDGE CASES:\n- Candidate says 'No questions' = still 1 (invitation was present).\n- Interviewer invites but interrupts candidate's response = still 1.\n- This dimension scores only PRESENCE of invitation. Quality is scored under Closing Quality.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [0 or 1]\nReason: [One sentence.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Candidate Question Invitation dimension from an interview transcript.\n\nDIMENSION: Candidate Question Invitation (Binary: 1 = No, 2 = Yes)\n\nSCORING CRITERION:\nScore 2 if the interviewer issued any form of invitation for candidate questions.\nEven the minimal Do you have any questions for me qualifies as 2.\nScore 1 only if no invitation was issued, or if the interviewer explicitly cancelled the opportunity.\n\nEDGE CASES:\n- Candidate says no questions = still 2 (invitation was present).\n- Interviewer invites but interrupts candidate's response = still 2.\n- This dimension scores only PRESENCE of invitation. Quality is scored under Closing Quality.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1 or 2]\nReason: [One sentence.]"
   },
   {
     "name": "Interview Closing",
     "type": "binary",
-    "scale": [1, 2],
+    "scale": [
+      1,
+      2
+    ],
     "core_scoring_question": "Did the interviewer close the interview with BOTH a thank-you AND mention of next steps?",
     "criteria": {
-      "1": "ANY of the following: (a) no closing at all — interview ends abruptly; (b) thanks present but NO mention of next steps whatsoever; (c) next steps mentioned but NO thanks; (d) candidate initiates the end of the conversation without any interviewer closing.",
-      "2": "BOTH elements must be present simultaneously: (1) An explicit thank-you to the candidate for their time (any form), AND (2) At least one mention of next steps — even vague ('the recruiter will be in touch', 'you'll hear from us soon'). Either element alone = 1."
+      "1": "ANY of the following: (a) no closing at all - interview ends abruptly; (b) thanks present but NO mention of next steps whatsoever; (c) next steps mentioned but NO thanks; (d) candidate initiates the end of the conversation without any interviewer closing.",
+      "2": "BOTH elements must be present simultaneously: (1) An explicit thank-you to the candidate for their time (any form), AND (2) At least one mention of next steps - even vague. Either element alone = 1."
     },
     "edge_cases": [
-      "'Thanks so much, talk soon!' = 1 (thanks present, but no mention of process or next steps).",
-      "'The recruiter will reach out in the next few days.' with no thank-you = 1.",
-      "'Thanks for your time today! You'll hear from our recruiter soon.' = 2.",
-      "Virtual Onsite mid-interviews: 'You'll continue with the next interviewer' counts as next steps — can score 2 if thanks also present."
+      "Thanks only with no next steps = 1.",
+      "Next steps only with no thank-you = 1.",
+      "Thanks for your time today plus mention of recruiter follow-up = 2.",
+      "Virtual Onsite mid-interviews: continuing with the next interviewer counts as next steps - can score 2 if thanks also present."
     ],
-    "calibration_note": "The core rater error was treating thanks OR next steps as sufficient. BOTH elements must be present simultaneously to score 2. Either alone = 1.",
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Interview Closing dimension from an interview transcript.\n\nDIMENSION: Interview Closing (Binary: 1 = No, 2 = Yes)\n\nCALIBRATION NOTE: BOTH elements — thanks AND next steps — must be present simultaneously to score 2. Either alone = 1.\n\nSCORING CRITERION:\nScore 2 if and only if BOTH are present:\n(1) Explicit thank-you for the candidate's time (any form),\n(2) At least one mention of next steps (even vague: 'the recruiter will be in touch').\nScore 1 if either element is missing, or if the interview ends without a formal close.\n\nEDGE CASES:\n- 'Thanks so much, talk soon!' = 1 (no next steps).\n- 'You'll hear from us soon' with no thank-you = 1.\n- Virtual Onsite mid-interviews: 'you'll continue with the next interviewer' = valid next steps.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1 or 2]\nReason: [One sentence — identify which elements were present or absent.]"
+    "calibration_note": "BOTH elements - thanks AND next steps - must be present simultaneously to score 2. Either alone = 1.",
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Interview Closing dimension from an interview transcript.\n\nDIMENSION: Interview Closing (Binary: 1 = No, 2 = Yes)\n\nCALIBRATION NOTE: BOTH elements - thanks AND next steps - must be present simultaneously to score 2. Either alone = 1.\n\nSCORING CRITERION:\nScore 2 if and only if BOTH are present:\n(1) Explicit thank-you for the candidate's time (any form),\n(2) At least one mention of next steps (even vague: the recruiter will be in touch).\nScore 1 if either element is missing, or if the interview ends without a formal close.\n\nEDGE CASES:\n- Thanks only with no next steps = 1.\n- Next steps only with no thank-you = 1.\n- Virtual Onsite mid-interviews: continuing with the next interviewer = valid next steps.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1 or 2]\nReason: [One sentence - identify which elements were present or absent.]"
   },
   {
     "name": "Closing Quality",
     "type": "scaled",
-    "scale": [1, 2, 3],
+    "scale": [
+      1,
+      2,
+      3
+    ],
     "core_scoring_question": "How complete, warm, and professional was the closing?",
     "criteria": {
       "1": "Abrupt or incomplete closing that fails to summarize or provide next steps clearly. The candidate is left uncertain about what happens next.",
-      "2": "Basic functional closing — includes a thank-you and some mention of next steps, but lacks warmth or personalization. Reads as formulaic ('Thanks, the recruiter will follow up').",
+      "2": "Basic functional closing - includes a thank-you and some mention of next steps, but lacks warmth or personalization. Reads as formulaic.",
       "3": "Complete and warm closing that includes: (1) a genuine thank-you that acknowledges something specific about the conversation, (2) a clear explanation of next steps with timeline if possible, and (3) a positive, encouraging send-off. All three sub-elements must be present."
     },
     "edge_cases": [
       "Distinguish from Interview Closing: Interview Closing = presence of close; Closing Quality = quality of close.",
-      "Virtual Onsite mid-interviews: 'You'll continue with the next interviewer right after this' is an adequate closing for the context — score 2, not 1.",
-      "A very warm, personalized closing with vague next steps ('someone will be in touch') = 2, not 3, because next steps lack specificity."
+      "Virtual Onsite mid-interviews: continuing with the next interviewer is an adequate closing for the context - score 2, not 1.",
+      "A very warm, personalized closing with vague next steps = 2, not 3, because next steps lack specificity."
     ],
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Closing Quality dimension from an interview transcript.\n\nDIMENSION: Closing Quality (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nIMPORTANT DISTINCTION:\nInterview Closing (binary) scores whether a closing happened at all.\nClosing Quality scores HOW GOOD the closing was.\n\nSCORING CRITERIA:\n1 (Poor): Abrupt or incomplete close. Candidate left uncertain about next steps.\n2 (Adequate): Functional close with thank-you and next steps, but formulaic and lacks warmth.\n3 (Excellent): Complete AND warm close: (1) specific thank-you referencing something from the conversation, (2) clear next steps with timeline, (3) positive, encouraging send-off.\n\nEDGE CASES:\n- Virtual Onsite mid-interview: 'You'll continue with the next interviewer' = adequate context-appropriate close = 2.\n- Warm thank-you + vague next steps = 2, not 3.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One to two sentences on completeness and warmth.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Closing Quality dimension from an interview transcript.\n\nDIMENSION: Closing Quality (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nIMPORTANT DISTINCTION:\nInterview Closing (binary) scores whether a closing happened at all.\nClosing Quality scores HOW GOOD the closing was.\n\nSCORING CRITERIA:\n1 (Poor): Abrupt or incomplete close. Candidate left uncertain about next steps.\n2 (Adequate): Functional close with thank-you and next steps, but formulaic and lacks warmth.\n3 (Excellent): Complete AND warm close: (1) specific thank-you referencing something from the conversation, (2) clear next steps with timeline, (3) positive, encouraging send-off.\n\nEDGE CASES:\n- Virtual Onsite mid-interview: continuing with the next interviewer = adequate context-appropriate close = 2.\n- Warm thank-you with vague next steps = 2, not 3.\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One to two sentences on completeness and warmth.]"
   },
   {
     "name": "Warmth and Professional Demeanor",
     "type": "scaled",
-    "scale": [1, 2, 3],
+    "scale": [
+      1,
+      2,
+      3
+    ],
     "core_scoring_question": "Did the interviewer consistently demonstrate warmth and professionalism throughout the interview, beyond baseline courtesy?",
     "criteria": {
       "1": "Detached, multitasking, curt, or disrespectful behavior visible in the transcript (e.g., abrupt responses, dismissive language, impatience).",
       "2": "Consistently courteous and professional throughout. No visible disengagement. This describes the MAJORITY of interviews and is the baseline standard.",
-      "3": "Active, personalized warmth beyond politeness: uses candidate's name, expresses specific genuine appreciation for an answer, or shows empathy on a difficult topic. Evaluate ONLY language evidence — do not infer warmth from tone of voice."
+      "3": "Active, personalized warmth beyond politeness: uses candidate's name, expresses specific genuine appreciation for an answer, or shows empathy on a difficult topic. Evaluate ONLY language evidence."
     },
     "edge_cases": [
-      "Repeated 'Great, thanks' = 2 (formulaic politeness, not personalized warmth).",
-      "'[Name], that's a fascinating approach' = 3 (personalized warmth).",
+      "Repeated generic thanks = 2 (formulaic politeness, not personalized warmth).",
+      "Using candidate's name with specific appreciation = 3 (personalized warmth).",
       "Evaluate only language evidence. Do not infer warmth from tone of voice.",
-      "Do NOT upgrade to 3 for consistent politeness alone — courteous and professional = 2, the majority baseline."
+      "Do NOT upgrade to 3 for consistent politeness alone - courteous and professional = 2, the majority baseline."
     ],
     "calibration_note": "Courteous and professional = 2 (the majority baseline). Active, personalized warmth beyond politeness = 3. Do NOT upgrade to 3 for consistent politeness alone.",
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Warmth and Professional Demeanor dimension from an interview transcript.\n\nDIMENSION: Warmth and Professional Demeanor (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nCALIBRATION NOTE: Courteous and professional = 2 (the majority baseline). Active, personalized warmth beyond politeness = 3. Do NOT upgrade to 3 for consistent politeness alone.\n\nSCORING CRITERIA:\n1 (Poor): Detached, curt, impatient, or unprofessional behavior visible in the transcript.\n2 (Adequate): Consistently courteous and professional throughout. No visible disengagement. This describes most interviews.\n3 (Excellent): Active warmth — uses candidate's name, expresses specific genuine appreciation for an answer, or shows empathy on a difficult topic.\n\nIMPORTANT: Evaluate only language evidence. Do not infer warmth from tone of voice.\n\nEDGE CASES:\n- Repeated 'Great, thanks' = 2 (formulaic politeness).\n- '[Name], that's a fascinating approach' = 3 (personalized warmth).\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One sentence on whether warmth exceeded baseline politeness.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Warmth and Professional Demeanor dimension from an interview transcript.\n\nDIMENSION: Warmth and Professional Demeanor (Scale: 1 = Poor, 2 = Adequate, 3 = Excellent)\n\nCALIBRATION NOTE: Courteous and professional = 2 (the majority baseline). Active, personalized warmth beyond politeness = 3. Do NOT upgrade to 3 for consistent politeness alone.\n\nSCORING CRITERIA:\n1 (Poor): Detached, curt, impatient, or unprofessional behavior visible in the transcript.\n2 (Adequate): Consistently courteous and professional throughout. No visible disengagement. This describes most interviews.\n3 (Excellent): Active warmth - uses candidate's name, expresses specific genuine appreciation for an answer, or shows empathy on a difficult topic.\n\nIMPORTANT: Evaluate only language evidence. Do not infer warmth from tone of voice.\n\nEDGE CASES:\n- Repeated generic thanks = 2 (formulaic politeness).\n- Using candidate name with specific appreciation = 3 (personalized warmth).\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1, 2, or 3]\nReason: [One sentence on whether warmth exceeded baseline politeness.]"
   },
   {
     "name": "Selling Roblox",
     "type": "binary",
-    "scale": [1, 2],
+    "scale": [
+      1,
+      2
+    ],
     "core_scoring_question": "Did the interviewer actively share at least one specific, positive piece of information about Roblox as a place to work?",
     "criteria": {
-      "1": "The interviewer did not proactively share any specific information about Roblox as an employer. Merely mentioning the company name in passing ('here at Roblox') does NOT count. A generic, unsupported statement ('It's a great company') also does NOT count. Describing next steps or process = 1 (that is Interview Closing, not Selling Roblox).",
+      "1": "The interviewer did not proactively share any specific information about Roblox as an employer. Merely mentioning the company name in passing does NOT count. A generic unsupported statement also does NOT count. Describing next steps or process = 1 (that is Interview Closing, not Selling Roblox).",
       "2": "The interviewer proactively shared at least ONE piece of specific, positive information about Roblox as a workplace. Qualifying content includes: company mission or product impact, team culture or ways of working, career development or growth opportunities, specific benefits or perks, or genuine specific personal enthusiasm about the team or role. Answering a candidate's question about the company also qualifies (responsive selling counts)."
     },
     "edge_cases": [
-      "'Roblox is a great company' alone = 1 (too vague, no substantive information content).",
-      "'We really care about our players' safety, and that drives everything our team does' = 2 (specific mission-based selling).",
+      "Roblox is a great company alone = 1 (too vague, no substantive information content).",
+      "Specific mission-based statement about player impact = 2 (specific mission-based selling).",
       "Answering a candidate's question about the company = 2 (responsive selling still counts).",
-      "'The next steps are...' (describing process) = 1 (this is Interview Closing, not Selling Roblox).",
-      "Expressions of personal excitement = 2 only if specific: 'I joined because of the scale of impact' = 2; 'I love it here' = 1."
+      "Describing next steps or process = 1 (this is Interview Closing, not Selling Roblox).",
+      "Expressions of personal excitement = 2 only if specific."
     ],
     "calibration_note": "Generic company mentions do NOT qualify. Specific employer-value content is required.",
-    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Selling Roblox dimension from an interview transcript.\n\nDIMENSION: Selling Roblox (Binary: 1 = No, 2 = Yes)\n\nCALIBRATION NOTE: Generic company mentions do NOT qualify. Specific employer-value content is required.\n\nSCORING CRITERION:\nScore 2 if the interviewer proactively shared at least ONE piece of specific, positive information about Roblox as a place to work. Qualifying content includes:\n- Company mission, values, or product impact\n- Team culture or ways of working\n- Career development or growth opportunities\n- Specific benefits or perks\n- Personal enthusiasm about the team or role (must be specific, not generic)\n\nScore 1 if none of the above is present.\n\nEDGE CASES:\n- 'Roblox is a great company' = 1 (too vague, no information content).\n- 'We really care about player safety and that drives everything we do' = 2.\n- Answering a candidate's question about the company = 2 (responsive selling counts).\n- Describing next steps or process = 1 (that is Interview Closing, not Selling Roblox).\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1 or 2]\nReason: [One sentence explaining whether specific employer-value content was present.]"
+    "llm_prompt": "You are an expert interviewer quality evaluator. Your task is to score the Selling Roblox dimension from an interview transcript.\n\nDIMENSION: Selling Roblox (Binary: 1 = No, 2 = Yes)\n\nCALIBRATION NOTE: Generic company mentions do NOT qualify. Specific employer-value content is required.\n\nSCORING CRITERION:\nScore 2 if the interviewer proactively shared at least ONE piece of specific, positive information about Roblox as a place to work. Qualifying content includes:\n- Company mission, values, or product impact\n- Team culture or ways of working\n- Career development or growth opportunities\n- Specific benefits or perks\n- Personal enthusiasm about the team or role (must be specific, not generic)\n\nScore 1 if none of the above is present.\n\nEDGE CASES:\n- Generic great company statement = 1 (too vague, no information content).\n- Specific player safety mission statement = 2.\n- Answering a candidate's question about the company = 2 (responsive selling counts).\n- Describing next steps or process = 1 (that is Interview Closing, not Selling Roblox).\n\nOUTPUT FORMAT:\nRule Name: [string (copied directly from the rule).]\nScore: [1 or 2]\nReason: [One sentence explaining whether specific employer-value content was present.]"
+  }
+]
