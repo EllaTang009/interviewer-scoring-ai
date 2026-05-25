@@ -12,20 +12,30 @@
             <h1>SCORE INTERVIEW</h1>
             <a href="index.html" class="back-link">← BACK</a>
         </div>
-
         <div class="upload-grid">
             <div class="upload-left">
                 <div class="input-block">
                     <h2>INTERVIEW DETAILS</h2>
+ 
                     <label>TITLE</label>
                     <input type="text" id="titleInput" placeholder="Enter title here...">
+ 
+                    <label>INTERVIEW TYPE</label>
+                    <select id="typeSelect">
+                        <option value="" disabled selected>Select interview type...</option>
+                        <option value="Hiring Manager Interview">Hiring Manager Interview</option>
+                        <option value="Cross-Functional (Virtual Onsite)">Cross-Functional (Virtual Onsite)</option>
+                        <option value="Cross-Functional">Cross-Functional</option>
+                        <option value="TA Fit and Interest">TA Fit and Interest</option>
+                        <option value="Coding Interview">Coding Interview</option>
+                    </select>
+ 
                     <label>TRANSCRIPT</label>
                     <textarea id="transcriptInput" placeholder="Paste transcript here..."></textarea>
                     <div class="char-count">0 CHARACTERS</div>
                 </div>
                 <button id="scoreBtn" class="main-score-btn">SCORE INTERVIEW</button>
             </div>
-
             <div class="upload-right">
                 <div class="info-card">
                     <h3>WHAT TO INCLUDE</h3>
@@ -52,7 +62,6 @@
                 </div>
             </div>
         </div>
-
         <div id="result"></div>
     </div>
     <script src="script.js"></script>
