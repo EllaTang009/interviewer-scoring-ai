@@ -5,6 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Score Interview</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── Category selector ───────────────────────────────────────────── */
+        .category-select-block {
+            margin-top: 1.25rem;
+        }
+        .category-select-block h2 {
+            /* inherits .input-block h2 from style.css */
+        }
+        .category-select-block .block-sub {
+            font-size: 12px;
+            color: #999;
+            margin: 0.15rem 0 0.85rem;
+            letter-spacing: 0.04em;
+        }
+        .cat-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .cat-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            user-select: none;
+        }
+        .cat-label:hover {
+            border-color: #aaa;
+            background: #fafafa;
+        }
+        /* Highlight when checked */
+        .cat-label:has(.cat-cb:checked) {
+            border-color: #111;
+            background: #f5f5f5;
+        }
+        .cat-cb {
+            width: 16px;
+            height: 16px;
+            accent-color: #111;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .cat-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .cat-text strong {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111;
+            letter-spacing: 0.04em;
+        }
+        .cat-text span {
+            font-size: 11px;
+            color: #999;
+            letter-spacing: 0.03em;
+        }
+        /* Dim unchecked rows */
+        .cat-label:has(.cat-cb:not(:checked)) .cat-text strong,
+        .cat-label:has(.cat-cb:not(:checked)) .cat-text span {
+            color: #bbb;
+        }
+        /* Validation warning */
+        #cat-warning {
+            display: none;
+            font-size: 12px;
+            color: #E24B4A;
+            margin-top: 6px;
+        }
+    </style>
 </head>
 <body class="upload-page">
     <div class="upload-container">
@@ -14,6 +89,8 @@
         </div>
         <div class="upload-grid">
             <div class="upload-left">
+ 
+                <!-- ── Interview details ──────────────────────────────────── -->
                 <div class="input-block">
                     <h2>INTERVIEW DETAILS</h2>
  
@@ -34,8 +111,41 @@
                     <textarea id="transcriptInput" placeholder="Paste transcript here..."></textarea>
                     <div class="char-count">0 CHARACTERS</div>
                 </div>
+ 
+                <!-- ── Category selection ─────────────────────────────────── -->
+                <div class="input-block category-select-block">
+                    <h2>SCORING CATEGORIES</h2>
+                    <p class="block-sub">Select the sections you want to evaluate</p>
+                    <div class="cat-options">
+                        <label class="cat-label">
+                            <input type="checkbox" class="cat-cb" value="Opening" checked>
+                            <div class="cat-text">
+                                <strong>OPENING</strong>
+                                <span>Agenda Setting · Agenda Clarity · Rapport Building</span>
+                            </div>
+                        </label>
+                        <label class="cat-label">
+                            <input type="checkbox" class="cat-cb" value="Conducting" checked>
+                            <div class="cat-text">
+                                <strong>CONDUCTING</strong>
+                                <span>Questioning Strategy · Active Listening · Job Relevant Probing · Time Management · Risk Management</span>
+                            </div>
+                        </label>
+                        <label class="cat-label">
+                            <input type="checkbox" class="cat-cb" value="Closing" checked>
+                            <div class="cat-text">
+                                <strong>CLOSING</strong>
+                                <span>Candidate Q&amp;A · Interview Closing · Closing Quality · Warmth · Selling Roblox</span>
+                            </div>
+                        </label>
+                    </div>
+                    <p id="cat-warning">⚠ Please select at least one category.</p>
+                </div>
+ 
                 <button id="scoreBtn" class="main-score-btn">SCORE INTERVIEW</button>
             </div>
+ 
+            <!-- ── Right info panel ──────────────────────────────────────── -->
             <div class="upload-right">
                 <div class="info-card">
                     <h3>WHAT TO INCLUDE</h3>
@@ -64,6 +174,58 @@
         </div>
         <div id="result"></div>
     </div>
+ 
     <script src="script.js"></script>
+ 
+    <!--
+    ════════════════════════════════════════════════════════════════
+      script.js 需要做的两处改动（见下方注释）
+    ════════════════════════════════════════════════════════════════
+    -->
+    <script>
+        /**
+         * ✅ 全局辅助函数：读取当前选中的 categories
+         * script.js 里直接调用 getSelectedCategories() 即可
+         */
+        function getSelectedCategories() {
+            return [...document.querySelectorAll('.cat-cb:checked')].map(el => el.value);
+        }
+ 
+        /**
+         * ✅ 阻止提交时没有选任何 category
+         * 在 script.js 的 scoreBtn click handler 最顶部加上：
+         *
+         *   const categories = getSelectedCategories();
+         *   if (categories.length === 0) {
+         *       document.getElementById('cat-warning').style.display = 'block';
+         *       return;
+         *   }
+         *   document.getElementById('cat-warning').style.display = 'none';
+         *
+         * ──────────────────────────────────────────────────────────
+         * ✅ fetch 调用里 body 改为：
+         *
+         *   body: JSON.stringify({ text: transcript, categories })
+         *
+         * ──────────────────────────────────────────────────────────
+         * ✅ localStorage.setItem 存结果时加一个字段：
+         *
+         *   localStorage.setItem('currentResult', JSON.stringify({
+         *       details: apiResult,
+         *       interviewType: ...,
+         *       title: ...,
+         *       selectedCategories: categories    // ← 加这行
+         *   }));
+         */
+ 
+        // Hide warning when user re-checks a box
+        document.querySelectorAll('.cat-cb').forEach(cb => {
+            cb.addEventListener('change', () => {
+                if (getSelectedCategories().length > 0) {
+                    document.getElementById('cat-warning').style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
