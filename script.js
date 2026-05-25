@@ -15,14 +15,15 @@ const groupConfig = {
 const binaryRules = ["Agenda Setting", "Risk Management", "Candidate Question Invitation", "Interview Closing", "Selling Roblox"];
  
 // 本地存储历史记录
-function saveScoreHistory(title, interviewType, totalScore, rawData) {
+function saveScoreHistory(title, interviewType, totalScore, rawData, selectedCategories) {
   let history = JSON.parse(localStorage.getItem('interviewScoreHistory') || '[]');
   history.push({
     title: title || "Untitled Interview",
     interviewType: interviewType || "Not Specified",
     totalScore: totalScore,
     date: new Date().toLocaleString(),
-    details: rawData
+    details: rawData,
+    selectedCategories: selectedCategories  // ✅ 存入历史
   });
   localStorage.setItem('interviewScoreHistory', JSON.stringify(history));
 }
@@ -34,7 +35,6 @@ window.addEventListener('load', () => {
     if (idx !== null) {
       const history = JSON.parse(localStorage.getItem('interviewScoreHistory') || '[]');
       const target = history[idx];
-      // 跳转到 result.html 显示历史详情
       localStorage.setItem('currentResult', JSON.stringify(target));
       localStorage.removeItem('viewScoreIndex');
       window.location.href = 'result.html';
@@ -57,6 +57,14 @@ scoreBtn.addEventListener('click', async () => {
     return;
   }
  
+  // ✅ 1. 读取选中的 categories，并做最少选一项的校验
+  const categories = getSelectedCategories();
+  if (categories.length === 0) {
+    document.getElementById('cat-warning').style.display = 'block';
+    return;
+  }
+  document.getElementById('cat-warning').style.display = 'none';
+ 
   scoreBtn.disabled = true;
   scoreBtn.textContent = "SCORING...";
  
@@ -64,23 +72,25 @@ scoreBtn.addEventListener('click', async () => {
     const res = await fetch('https://interviewer-scoring-ai.onrender.com/score', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text })
+      // ✅ 2. 把 categories 传给后端
+      body: JSON.stringify({ text: text, categories: categories })
     });
     const rawData = await res.json();
  
     let totalScore = 0;
     rawData.forEach(item => totalScore += item.Result);
  
-    // 存历史
-    saveScoreHistory(title, interviewType, totalScore, rawData);
+    // ✅ 3. 历史记录也带上 selectedCategories
+    saveScoreHistory(title, interviewType, totalScore, rawData, categories);
  
-    // 存当前结果，跳转到结果页
+    // ✅ 4. 当前结果带上 selectedCategories，result.html 读取后只渲染对应分组
     localStorage.setItem('currentResult', JSON.stringify({
       title: title || "Untitled Interview",
       interviewType: interviewType || "Not Specified",
       totalScore: totalScore,
       date: new Date().toLocaleString(),
-      details: rawData
+      details: rawData,
+      selectedCategories: categories   // ✅ 加这行
     }));
  
     window.location.href = 'result.html';
