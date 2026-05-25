@@ -16,9 +16,9 @@
     </div>
     <script>
         const groupConfig = {
-            Opening: ["Agenda Setting", "Agenda Clarity", "Rapport Building"],
+            Opening:    ["Agenda Setting", "Agenda Clarity", "Rapport Building"],
             Conducting: ["Questioning Strategy", "Responsiveness and Active Listening", "Job Relevant Probing", "Time Management", "Risk Management"],
-            Closing: ["Closing Quality", "Warmth and Professional Demeanor", "Candidate Question Invitation", "Interview Closing", "Selling Roblox"]
+            Closing:    ["Closing Quality", "Warmth and Professional Demeanor", "Candidate Question Invitation", "Interview Closing", "Selling Roblox"]
         };
  
         const binaryRules = ["Agenda Setting", "Risk Management", "Candidate Question Invitation", "Interview Closing", "Selling Roblox"];
@@ -27,7 +27,8 @@
             return binaryRules.some(b => ruleName.includes(b)) ? 2 : 3;
         }
  
-        function renderVisualization(rawData, interviewType) {
+        // ─── Visualization (summary cards + radar + bar) ───────────────────────
+        function renderVisualization(rawData, interviewType, selectedCategories) {
             const grouped = { Opening: [], Conducting: [], Closing: [] };
             rawData.forEach(item => {
                 const ruleName = item["Rule Name"];
@@ -39,52 +40,57 @@
                 }
             });
  
+            // ✅ Only compute stats for selected categories
             const groupStats = {};
-            let totalScore = 0;
-            let totalMax = 0;
+            let totalScore = 0, totalMax = 0;
             for (const g of ["Opening", "Conducting", "Closing"]) {
                 let score = 0, max = 0;
-                grouped[g].forEach(item => {
-                    score += item.Result;
-                    max += getMaxScore(item["Rule Name"]);
-                });
+                if (selectedCategories.includes(g)) {
+                    grouped[g].forEach(item => {
+                        score += item.Result;
+                        max  += getMaxScore(item["Rule Name"]);
+                    });
+                }
                 groupStats[g] = { score, max };
                 totalScore += score;
-                totalMax += max;
+                totalMax   += max;
             }
+ 
             const pct = totalMax > 0 ? Math.round((totalScore / totalMax) * 100) : 0;
             const dimensionCount = rawData.length;
             const scoreColor = pct >= 80 ? "#1D9E75" : pct >= 60 ? "#BA7517" : "#E24B4A";
  
-            // 雷达图坐标
-            const cx = 120, cy = 105, R = 85;
-            const angles = [-90, 30, 150];
+            // ── Radar chart geometry ──────────────────────────────────────────
+            const cx = 120, cy = 115, R = 82;   // ✅ cy raised so top label has room
+            const angles = [-90, 30, 150];       // Opening(top), Closing(BR), Conducting(BL)
+            const radarGroups = ["Opening", "Closing", "Conducting"];
+ 
             function pt(r, deg) {
                 const rad = (deg * Math.PI) / 180;
                 return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
             }
             const outerPts = angles.map(a => pt(R, a));
-            const groups = ["Opening", "Closing", "Conducting"];
-            const dataPts = groups.map((g, i) => {
-                const ratio = groupStats[g].max > 0 ? groupStats[g].score / groupStats[g].max : 0;
+            const dataPts  = radarGroups.map((g, i) => {
+                const ratio = groupStats[g].max > 0
+                    ? groupStats[g].score / groupStats[g].max
+                    : 0;
                 return pt(R * ratio, angles[i]);
             });
             function ptsToStr(pts) {
                 return pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
             }
-            const grid50 = angles.map(a => pt(R * 0.5, a));
+            const grid50 = angles.map(a => pt(R * 0.50, a));
             const grid75 = angles.map(a => pt(R * 0.75, a));
-            const labelOffset = R + 18;
-            const labelPts = [
-                pt(labelOffset, -90),
-                pt(labelOffset, 30),
-                pt(labelOffset, 150),
-            ];
  
-            // 条形图
+            // ✅ Labels sit outside the outer polygon
+            const labelOffset = R + 20;
+            const labelPts = angles.map(a => pt(labelOffset, a));
+            // labelPts[0] = Opening (top),  [1] = Closing (BR),  [2] = Conducting (BL)
+ 
+            // ── Dimension bar rows ────────────────────────────────────────────
             const barsHtml = rawData.map(item => {
                 const isBinary = binaryRules.some(b => item["Rule Name"].includes(b));
-                const max = isBinary ? 2 : 3;
+                const max   = isBinary ? 2 : 3;
                 const ratio = item.Result / max;
                 let color, label;
                 if (isBinary) {
@@ -94,7 +100,9 @@
                     color = item.Result === 3 ? "#1D9E75" : item.Result === 2 ? "#378ADD" : "#E24B4A";
                     label = item.Result;
                 }
-                const shortName = item["Rule Name"].length > 26 ? item["Rule Name"].slice(0, 24) + "…" : item["Rule Name"];
+                const shortName = item["Rule Name"].length > 26
+                    ? item["Rule Name"].slice(0, 24) + "…"
+                    : item["Rule Name"];
                 return `
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px;">
                     <div style="width:175px;flex-shrink:0;font-size:12px;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${shortName}</div>
@@ -105,13 +113,24 @@
                 </div>`;
             }).join("");
  
+            // ── Selected-category chips shown next to Interview Type ──────────
+            const catChips = selectedCategories.map(c =>
+                `<span style="display:inline-block;padding:2px 8px;background:#111;color:#fff;border-radius:20px;font-size:10px;letter-spacing:0.06em;margin-left:6px;">${c}</span>`
+            ).join("");
+ 
             return `
             <div style="margin-bottom:2rem;">
  
                 <!-- Interview Type Banner -->
-                <div style="margin-bottom:1.5rem;padding:0.75rem 1.25rem;background:#f8f8f8;border-left:3px solid #000;border-radius:0 8px 8px 0;">
-                    <span style="font-size:11px;letter-spacing:0.08em;color:#888;">INTERVIEW TYPE</span>
-                    <div style="font-size:15px;font-weight:600;color:#111;margin-top:2px;">${interviewType}</div>
+                <div style="margin-bottom:1.5rem;padding:0.75rem 1.25rem;background:#f8f8f8;border-left:3px solid #000;border-radius:0 8px 8px 0;display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
+                    <div>
+                        <span style="font-size:11px;letter-spacing:0.08em;color:#888;">INTERVIEW TYPE</span>
+                        <div style="font-size:15px;font-weight:600;color:#111;margin-top:2px;">${interviewType}</div>
+                    </div>
+                    <div style="margin-left:auto;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                        <span style="font-size:10px;color:#aaa;letter-spacing:0.06em;">SCORED:</span>
+                        ${catChips}
+                    </div>
                 </div>
  
                 <!-- Summary Cards -->
@@ -136,20 +155,39 @@
                     <!-- Radar -->
                     <div style="background:#fff;border:0.5px solid #ddd;border-radius:12px;padding:1rem;">
                         <div style="font-size:13px;font-weight:500;color:#111;margin-bottom:10px;">Section Overview</div>
-                        <svg width="100%" viewBox="0 0 240 210" role="img" aria-label="Section score radar chart">
+                        <!--
+                            ✅ viewBox starts at y=-20 to give room for the Opening label
+                               which sits above cy (the top vertex y ≈ cy - R - labelOffset).
+                               Total height kept at 230 to stay proportional.
+                        -->
+                        <svg width="100%" viewBox="0 -20 240 230" role="img" aria-label="Section score radar chart">
                             <title>Section Score Radar</title>
-                            <polygon points="${ptsToStr(grid50)}" fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
-                            <polygon points="${ptsToStr(grid75)}" fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
+ 
+                            <!-- Grid lines -->
+                            <polygon points="${ptsToStr(grid50)}"  fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
+                            <polygon points="${ptsToStr(grid75)}"  fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
                             <polygon points="${ptsToStr(outerPts)}" fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
-                            ${outerPts.map(p => `<line x1="${cx}" y1="${cy}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}" stroke="#e0e0e0" stroke-width="0.5"/>`).join("")}
+                            ${outerPts.map(p =>
+                                `<line x1="${cx}" y1="${cy}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}" stroke="#e0e0e0" stroke-width="0.5"/>`
+                            ).join("")}
+ 
+                            <!-- Data polygon -->
                             <polygon points="${ptsToStr(dataPts)}" fill="#378ADD" fill-opacity="0.2" stroke="#378ADD" stroke-width="1.5"/>
-                            ${dataPts.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="#378ADD"/>`).join("")}
-                            <text x="${labelPts[0][0].toFixed(1)}" y="${(labelPts[0][1] - 4).toFixed(1)}" text-anchor="middle" font-size="11" fill="#888">Opening</text>
-                            <text x="${labelPts[0][0].toFixed(1)}" y="${(labelPts[0][1] + 8).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="500" fill="#111">${groupStats["Opening"].score}/${groupStats["Opening"].max}</text>
-                            <text x="${labelPts[1][0].toFixed(1)}" y="${(labelPts[1][1] - 4).toFixed(1)}" text-anchor="middle" font-size="11" fill="#888">Closing</text>
-                            <text x="${labelPts[1][0].toFixed(1)}" y="${(labelPts[1][1] + 8).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="500" fill="#111">${groupStats["Closing"].score}/${groupStats["Closing"].max}</text>
-                            <text x="${labelPts[2][0].toFixed(1)}" y="${(labelPts[2][1] - 4).toFixed(1)}" text-anchor="middle" font-size="11" fill="#888">Conducting</text>
-                            <text x="${labelPts[2][0].toFixed(1)}" y="${(labelPts[2][1] + 8).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="500" fill="#111">${groupStats["Conducting"].score}/${groupStats["Conducting"].max}</text>
+                            ${dataPts.map(p =>
+                                `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3" fill="#378ADD"/>`
+                            ).join("")}
+ 
+                            <!-- ✅ Opening (top vertex) -->
+                            <text x="${labelPts[0][0].toFixed(1)}" y="${(labelPts[0][1] - 6).toFixed(1)}"  text-anchor="middle" font-size="11" fill="#888">Opening</text>
+                            <text x="${labelPts[0][0].toFixed(1)}" y="${(labelPts[0][1] + 8).toFixed(1)}"  text-anchor="middle" font-size="11" font-weight="500" fill="#111">${groupStats["Opening"].score}/${groupStats["Opening"].max}</text>
+ 
+                            <!-- ✅ Closing (bottom-right vertex) -->
+                            <text x="${labelPts[1][0].toFixed(1)}" y="${(labelPts[1][1] - 4).toFixed(1)}"  text-anchor="middle" font-size="11" fill="#888">Closing</text>
+                            <text x="${labelPts[1][0].toFixed(1)}" y="${(labelPts[1][1] + 10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="500" fill="#111">${groupStats["Closing"].score}/${groupStats["Closing"].max}</text>
+ 
+                            <!-- ✅ Conducting (bottom-left vertex) -->
+                            <text x="${labelPts[2][0].toFixed(1)}" y="${(labelPts[2][1] - 4).toFixed(1)}"  text-anchor="middle" font-size="11" fill="#888">Conducting</text>
+                            <text x="${labelPts[2][0].toFixed(1)}" y="${(labelPts[2][1] + 10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="500" fill="#111">${groupStats["Conducting"].score}/${groupStats["Conducting"].max}</text>
                         </svg>
                     </div>
  
@@ -168,7 +206,8 @@
             </div>`;
         }
  
-        function renderScoreCards(rawData) {
+        // ─── Score Cards (per dimension) ───────────────────────────────────────
+        function renderScoreCards(rawData, selectedCategories) {
             const grouped = { Opening: [], Conducting: [], Closing: [] };
             rawData.forEach(item => {
                 const ruleName = item["Rule Name"];
@@ -181,14 +220,18 @@
             });
  
             let html = "";
+            // ✅ Only render sections that were actually selected & have data
             for (const groupName of ["Opening", "Conducting", "Closing"]) {
+                if (!selectedCategories.includes(groupName)) continue;
+                if (grouped[groupName].length === 0) continue;
+ 
                 html += `<h2 class="group-title">${groupName.toUpperCase()} THE INTERVIEW</h2><div class="card-grid">`;
                 grouped[groupName].forEach(item => {
                     const rule = item["Rule Name"];
-                    const res = item.Result;
+                    const res  = item.Result;
                     const reasoning = item.Reasoning || "";
                     const isBinary = binaryRules.some(b => rule.includes(b));
-                    const scoreClass = isBinary ? (res === 2 ? "yes-score" : "no-score") : "num-score";
+                    const scoreClass   = isBinary ? (res === 2 ? "yes-score" : "no-score") : "num-score";
                     const displayScore = isBinary ? (res === 2 ? "2 (✓)" : "1 (✗)") : res;
  
                     html += `
@@ -197,7 +240,7 @@
                             <h3>${rule.toUpperCase()}</h3>
                             <span class="${scoreClass}">${displayScore}</span>
                         </div>
-                        <div class="card-sub">${groupName}</div>
+                        <div class="card-sub">${groupName.toUpperCase()}</div>
                         <div class="card-section">
                             <div class="section-label">REASONING</div>
                             <div class="section-bar"></div>
@@ -222,6 +265,7 @@
             return html;
         }
  
+        // ─── Entry point ───────────────────────────────────────────────────────
         window.addEventListener('load', () => {
             const resultDiv = document.getElementById('result');
             const data = localStorage.getItem('currentResult');
@@ -231,16 +275,18 @@
                 return;
             }
  
-            const result = JSON.parse(data);
-            const rawData = result.details;
+            const result       = JSON.parse(data);
+            const rawData      = result.details;
             const interviewType = result.interviewType || "Not Specified";
-            const title = result.title || "Untitled Interview";
+            const title        = result.title || "Untitled Interview";
+            // ✅ Read which categories were selected at submission time (fallback: all three)
+            const selectedCategories = result.selectedCategories || ["Opening", "Conducting", "Closing"];
  
             document.querySelector('h1').textContent = title.toUpperCase();
  
             resultDiv.innerHTML =
-                renderVisualization(rawData, interviewType) +
-                renderScoreCards(rawData);
+                renderVisualization(rawData, interviewType, selectedCategories) +
+                renderScoreCards(rawData, selectedCategories);
         });
     </script>
 </body>
