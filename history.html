@@ -5,6 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Score History</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .history-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #000;
+        }
+        .history-table table th:first-child,
+        .history-table table td:first-child {
+            width: 40px;
+            text-align: center;
+        }
+        .history-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        .select-all-label {
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .selected-count {
+            font-size: 12px;
+            color: #888;
+            margin-left: auto;
+        }
+        .deep-analyze-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .deep-analyze-btn:hover {
+            background: #333;
+        }
+        .deep-analyze-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body class="upload-page">
     <div class="upload-container">
@@ -12,10 +66,8 @@
             <h1>SCORE HISTORY</h1>
             <a href="upload.html" class="back-link">← BACK TO SCORE</a>
         </div>
-
         <div id="historyList"></div>
     </div>
-
     <script>
         const historyList = document.getElementById('historyList');
         const history = JSON.parse(localStorage.getItem('interviewScoreHistory') || '[]');
@@ -23,37 +75,95 @@
         if (history.length === 0) {
             historyList.innerHTML = "<p>No scoring history yet.</p>";
         } else {
-            let html = `<div class="history-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Interview Title</th>
-                        <th>Total Score</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+            let html = `
+            <div class="history-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>INTERVIEW TITLE</th>
+                            <th>INTERVIEW TYPE</th>
+                            <th>TOTAL SCORE</th>
+                            <th>DATE</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
             history.forEach((item, index) => {
+                const interviewType = item.interviewType || '—';
                 html += `
                 <tr>
                     <td>
+                        <input type="checkbox" class="history-checkbox" data-index="${index}">
+                    </td>
+                    <td>
                         <a href="#" class="history-title-link" data-index="${index}">${item.title}</a>
                     </td>
+                    <td>${interviewType}</td>
                     <td>${item.totalScore}</td>
                     <td>${item.date}</td>
                 </tr>`;
             });
-            html += `</tbody></table></div>`;
+
+            html += `
+                    </tbody>
+                </table>
+            </div>
+            <div class="history-actions">
+                <label class="select-all-label">
+                    <input type="checkbox" id="selectAll" class="history-checkbox"> SELECT ALL
+                </label>
+                <span class="selected-count" id="selectedCount">0 selected</span>
+                <button class="deep-analyze-btn" id="deepAnalyzeBtn" disabled>DEEP ANALYZE</button>
+            </div>`;
+
             historyList.innerHTML = html;
 
-            // 绑定点击事件：保存选中的index，跳转到上传页并展示详情
+            // 点击标题跳转到结果详情
             document.querySelectorAll('.history-title-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     const idx = e.target.dataset.index;
-                    localStorage.setItem('viewScoreIndex', idx);
-                    window.location.href = "upload.html#view-detail";
+                    const target = history[idx];
+                    localStorage.setItem('currentResult', JSON.stringify(target));
+                    window.location.href = 'result.html';
                 });
+            });
+
+            // 勾选逻辑
+            const checkboxes = document.querySelectorAll('.history-checkbox:not(#selectAll)');
+            const selectAll = document.getElementById('selectAll');
+            const selectedCount = document.getElementById('selectedCount');
+            const deepAnalyzeBtn = document.getElementById('deepAnalyzeBtn');
+
+            function updateCount() {
+                const checked = document.querySelectorAll('.history-checkbox:not(#selectAll):checked');
+                const n = checked.length;
+                selectedCount.textContent = `${n} selected`;
+                deepAnalyzeBtn.disabled = n === 0;
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    updateCount();
+                    // 同步 select all 状态
+                    const allChecked = [...checkboxes].every(c => c.checked);
+                    selectAll.checked = allChecked;
+                    selectAll.indeterminate = !allChecked && [...checkboxes].some(c => c.checked);
+                });
+            });
+
+            selectAll.addEventListener('change', () => {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                updateCount();
+            });
+
+            // Deep Analyze 按钮：收集选中记录存到 localStorage，跳转到分析页
+            deepAnalyzeBtn.addEventListener('click', () => {
+                const checked = document.querySelectorAll('.history-checkbox:not(#selectAll):checked');
+                const selectedData = [...checked].map(cb => history[cb.dataset.index]);
+                localStorage.setItem('deepAnalyzeData', JSON.stringify(selectedData));
+                window.location.href = 'analyze.html';
             });
         }
     </script>
