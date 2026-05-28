@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Analysis</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { box-sizing: border-box; }
+
+        .analyze-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .analyze-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            border-bottom: 2px solid #000;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .analyze-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin: 0;
+        }
+
+        .back-link {
+            font-size: 12px;
+            color: #888;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+        }
+        .back-link:hover { color: #000; }
+
+        /* Type filter */
+        .type-filter-section {
+            margin-bottom: 2rem;
+        }
+        .type-filter-label {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .type-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .type-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: 1.5px solid #ddd;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s;
+            background: #fff;
+            color: #444;
+        }
+        .type-chip input[type="checkbox"] {
+            width: 13px;
+            height: 13px;
+            accent-color: #000;
+            cursor: pointer;
+        }
+        .type-chip.active {
+            border-color: #000;
+            background: #000;
+            color: #fff;
+        }
+        .type-chip.active input[type="checkbox"] {
+            accent-color: #fff;
+        }
+        .chip-count {
+            font-size: 10px;
+            opacity: 0.6;
+        }
+
+        /* Summary row */
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+        .summary-card {
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+        }
+        .summary-val {
+            font-size: 26px;
+            font-weight: 500;
+            color: #111;
+        }
+        .summary-lbl {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+            letter-spacing: 0.04em;
+        }
+
+        /* Chart section */
+        .chart-section {
+            background: #fff;
+            border: 0.5px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .chart-title {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: #111;
+            margin-bottom: 4px;
+        }
+        .chart-subtitle {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #666;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* Bar rows */
+        .rubric-row {
+            margin-bottom: 14px;
+        }
+        .rubric-name {
+            font-size: 12px;
+            color: #444;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .rubric-name-text {
+            font-weight: 500;
+        }
+        .rubric-type-tag {
+            font-size: 10px;
+            color: #aaa;
+            font-weight: 400;
+        }
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .bar-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bar-line-label {
+            width: 32px;
+            font-size: 10px;
+            color: #aaa;
+            flex-shrink: 0;
+            text-align: right;
+        }
+        .bar-track {
+            flex: 1;
+            height: 7px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+        .bar-val {
+            width: 28px;
+            font-size: 11px;
+            color: #555;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Group divider */
+        .group-header {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #bbb;
+            margin: 1.5rem 0 10px;
+            padding-bottom: 4px;
+            border-bottom: 0.5px solid #eee;
+        }
+        .group-header:first-child { margin-top: 0; }
+
+        /* No data */
+        .no-data {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            padding: 3rem 0;
+        }
+
+        /* Table section */
+        .table-section {
+            background: #fff;
+            border: 0.5px solid #ddd;
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .stats-table th {
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            color: #888;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+        }
+        .stats-table td {
+            padding: 9px 12px;
+            border-bottom: 0.5px solid #f5f5f5;
+            color: #333;
+        }
+        .stats-table tr:last-child td { border-bottom: none; }
+        .score-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .pill-green { background: #e8f8f2; color: #1D9E75; }
+        .pill-blue  { background: #e8f1fb; color: #378ADD; }
+        .pill-red   { background: #fdeaea; color: #E24B4A; }
+        .pill-gray  { background: #f5f5f5; color: #888; }
+    </style>
+</head>
+<body>
+<div class="analyze-container">
+
+    <div class="analyze-header">
+        <h1>DEEP ANALYSIS</h1>
+        <a href="history.html" class="back-link">← BACK TO HISTORY</a>
+    </div>
+
+    <div id="appContent"></div>
+
+</div>
+<script>
+// ── Config ──────────────────────────────────────────────
+const groupConfig = {
+    Opening:    ["Agenda Setting", "Agenda Clarity", "Rapport Building"],
+    Conducting: ["Questioning Strategy", "Responsiveness and Active Listening", "Job Relevant Probing", "Time Management", "Risk Management"],
+    Closing:    ["Closing Quality", "Warmth and Professional Demeanor", "Candidate Question Invitation", "Interview Closing", "Selling Roblox"]
+};
+const binaryRules = ["Agenda Setting", "Risk Management", "Candidate Question Invitation", "Interview Closing", "Selling Roblox"];
+const allRubrics = Object.values(groupConfig).flat();
+
+function getMaxScore(ruleName) {
+    return binaryRules.some(b => ruleName.includes(b)) ? 2 : 3;
+}
+function getRubricScore(details, ruleName) {
+    const item = details.find(d => d["Rule Name"] && d["Rule Name"].includes(ruleName.split(" ")[0]));
+    return item ? item.Result : null;
+}
+
+// ── State ────────────────────────────────────────────────
+const rawData = JSON.parse(localStorage.getItem('deepAnalyzeData') || '[]');
+let selectedTypes = new Set();
+
+// ── Init ─────────────────────────────────────────────────
+const appContent = document.getElementById('appContent');
+
+if (!rawData.length) {
+    appContent.innerHTML = `<div class="no-data">No data selected. <a href="history.html">Go back to history.</a></div>`;
+} else {
+    // Collect all types present
+    const typeCounts = {};
+    rawData.forEach(r => {
+        const t = r.interviewType || 'Not Specified';
+        typeCounts[t] = (typeCounts[t] || 0) + 1;
+    });
+    const allTypes = Object.keys(typeCounts);
+    // Default: select all
+    allTypes.forEach(t => selectedTypes.add(t));
+
+    renderPage(allTypes, typeCounts);
+}
+
+function renderPage(allTypes, typeCounts) {
+    appContent.innerHTML = `
+        <!-- Type filter -->
+        <div class="type-filter-section">
+            <div class="type-filter-label">FILTER BY INTERVIEW TYPE</div>
+            <div class="type-chips" id="typeChips">
+                ${allTypes.map(t => `
+                <label class="type-chip ${selectedTypes.has(t) ? 'active' : ''}" id="chip-${CSS.escape(t)}">
+                    <input type="checkbox" value="${t}" ${selectedTypes.has(t) ? 'checked' : ''}>
+                    ${t}
+                    <span class="chip-count">(${typeCounts[t]})</span>
+                </label>`).join('')}
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-row" id="summaryRow"></div>
+
+        <!-- Bar chart -->
+        <div class="chart-section">
+            <div class="chart-title">RUBRIC PERFORMANCE — AVG / MAX / MIN</div>
+            <div class="chart-subtitle">Scores normalized to their max possible value. Binary rules max = 2, Scaled max = 3.</div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#378ADD"></div>Average</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>Max</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#E24B4A"></div>Min</div>
+            </div>
+            <div id="barChart"></div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-section">
+            <div class="chart-title" style="margin-bottom:4px">DETAILED STATS TABLE</div>
+            <div class="chart-subtitle">All scores shown as raw values.</div>
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>RUBRIC</th>
+                        <th>TYPE</th>
+                        <th>INTERVIEWS</th>
+                        <th>AVG</th>
+                        <th>MAX</th>
+                        <th>MIN</th>
+                        <th>MAX POSSIBLE</th>
+                    </tr>
+                </thead>
+                <tbody id="statsTableBody"></tbody>
+            </table>
+        </div>
+    `;
+
+    // Bind chip events
+    document.querySelectorAll('.type-chip input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const val = cb.value;
+            const chip = cb.closest('.type-chip');
+            if (cb.checked) {
+                selectedTypes.add(val);
+                chip.classList.add('active');
+            } else {
+                selectedTypes.delete(val);
+                chip.classList.remove('active');
+            }
+            updateCharts();
+        });
+    });
+
+    updateCharts();
+}
+
+function computeStats() {
+    // Filter data by selected types
+    const filtered = rawData.filter(r => selectedTypes.has(r.interviewType || 'Not Specified'));
+
+    const stats = {}; // rubricName -> { scores: [] }
+    allRubrics.forEach(r => stats[r] = { scores: [] });
+
+    filtered.forEach(record => {
+        if (!record.details) return;
+        allRubrics.forEach(rubric => {
+            const score = getRubricScore(record.details, rubric);
+            if (score !== null) stats[rubric].scores.push(score);
+        });
+    });
+
+    return { filtered, stats };
+}
+
+function updateCharts() {
+    const { filtered, stats } = computeStats();
+
+    // Summary
+    const summaryRow = document.getElementById('summaryRow');
+    const totalInterviews = filtered.length;
+    const avgTotal = totalInterviews === 0 ? 0 :
+        (filtered.reduce((sum, r) => sum + (r.totalScore || 0), 0) / totalInterviews).toFixed(1);
+    const typesSelected = selectedTypes.size;
+
+    summaryRow.innerHTML = `
+        <div class="summary-card">
+            <div class="summary-val">${totalInterviews}</div>
+            <div class="summary-lbl">INTERVIEWS ANALYZED</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-val">${avgTotal}</div>
+            <div class="summary-lbl">AVG TOTAL SCORE</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-val">${typesSelected}</div>
+            <div class="summary-lbl">TYPES SELECTED</div>
+        </div>
+    `;
+
+    if (totalInterviews === 0) {
+        document.getElementById('barChart').innerHTML = `<div class="no-data">No interviews match the selected filters.</div>`;
+        document.getElementById('statsTableBody').innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:2rem;">No data</td></tr>`;
+        return;
+    }
+
+    // Bar chart
+    let barHtml = '';
+    for (const groupName of ["Opening", "Conducting", "Closing"]) {
+        barHtml += `<div class="group-header">${groupName.toUpperCase()}</div>`;
+        for (const rubric of groupConfig[groupName]) {
+            const s = stats[rubric];
+            const maxPossible = getMaxScore(rubric);
+            const isBin = binaryRules.some(b => rubric.includes(b));
+
+            if (!s.scores.length) {
+                barHtml += `<div class="rubric-row"><div class="rubric-name"><span class="rubric-name-text">${rubric}</span><span class="rubric-type-tag">No data</span></div></div>`;
+                continue;
+            }
+
+            const avg = s.scores.reduce((a, b) => a + b, 0) / s.scores.length;
+            const max = Math.max(...s.scores);
+            const min = Math.min(...s.scores);
+
+            const avgPct = (avg / maxPossible * 100).toFixed(1);
+            const maxPct = (max / maxPossible * 100).toFixed(1);
+            const minPct = (min / maxPossible * 100).toFixed(1);
+
+            barHtml += `
+            <div class="rubric-row">
+                <div class="rubric-name">
+                    <span class="rubric-name-text">${rubric}</span>
+                    <span class="rubric-type-tag">${isBin ? 'Binary (max 2)' : 'Scaled (max 3)'}</span>
+                </div>
+                <div class="bar-group">
+                    <div class="bar-line">
+                        <div class="bar-line-label">AVG</div>
+                        <div class="bar-track"><div class="bar-fill" style="width:${avgPct}%;background:#378ADD"></div></div>
+                        <div class="bar-val">${avg.toFixed(2)}</div>
+                    </div>
+                    <div class="bar-line">
+                        <div class="bar-line-label">MAX</div>
+                        <div class="bar-track"><div class="bar-fill" style="width:${maxPct}%;background:#1D9E75"></div></div>
+                        <div class="bar-val">${max}</div>
+                    </div>
+                    <div class="bar-line">
+                        <div class="bar-line-label">MIN</div>
+                        <div class="bar-track"><div class="bar-fill" style="width:${minPct}%;background:#E24B4A"></div></div>
+                        <div class="bar-val">${min}</div>
+                    </div>
+                </div>
+            </div>`;
+        }
+    }
+    document.getElementById('barChart').innerHTML = barHtml;
+
+    // Stats table
+    let tableHtml = '';
+    for (const groupName of ["Opening", "Conducting", "Closing"]) {
+        for (const rubric of groupConfig[groupName]) {
+            const s = stats[rubric];
+            const maxPossible = getMaxScore(rubric);
+            const isBin = binaryRules.some(b => rubric.includes(b));
+
+            if (!s.scores.length) {
+                tableHtml += `<tr><td>${rubric}</td><td><span class="score-pill pill-gray">${isBin ? 'Binary' : 'Scaled'}</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>${maxPossible}</td></tr>`;
+                continue;
+            }
+
+            const avg = (s.scores.reduce((a, b) => a + b, 0) / s.scores.length).toFixed(2);
+            const max = Math.max(...s.scores);
+            const min = Math.min(...s.scores);
+
+            const avgNum = parseFloat(avg);
+            const avgRatio = avgNum / maxPossible;
+            const avgClass = avgRatio >= 0.8 ? 'pill-green' : avgRatio >= 0.6 ? 'pill-blue' : 'pill-red';
+
+            tableHtml += `
+            <tr>
+                <td>${rubric}</td>
+                <td><span class="score-pill pill-gray">${isBin ? 'Binary' : 'Scaled'}</span></td>
+                <td>${s.scores.length}</td>
+                <td><span class="score-pill ${avgClass}">${avg}</span></td>
+                <td>${max}</td>
+                <td>${min}</td>
+                <td>${maxPossible}</td>
+            </tr>`;
+        }
+    }
+    document.getElementById('statsTableBody').innerHTML = tableHtml;
+}
+</script>
+</body>
+</html>
